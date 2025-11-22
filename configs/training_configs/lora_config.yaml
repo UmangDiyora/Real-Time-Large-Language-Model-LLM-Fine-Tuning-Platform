@@ -1,0 +1,22 @@
+lora_config:
+  r: 16
+  lora_alpha: 32
+  target_modules:
+    - q_proj
+    - v_proj
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+training:
+  num_epochs: 3
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 3.0e-4
+  warmup_steps: 100
+  max_grad_norm: 1.0
+  fp16: true
+  logging_steps: 10
+  save_steps: 500
+  eval_steps: 500
+  output_dir: "./checkpoints/lora"
