@@ -1,6 +1,6 @@
-from transformers import PreTrainedTokenizer
 from typing import Dict, List, Any
 import torch
+from transformers import PreTrainedTokenizer
 
 def tokenize_dataset(examples: Dict[str, List[str]], tokenizer: PreTrainedTokenizer, max_length: int = 2048) -> Dict[str, torch.Tensor]:
     """
@@ -8,12 +8,13 @@ def tokenize_dataset(examples: Dict[str, List[str]], tokenizer: PreTrainedTokeni
     
     Args:
         examples: Dictionary containing 'prompt' and 'completion' lists.
-        tokenizer: The tokenizer to use.
+        tokenizer: Hugging Face tokenizer.
         max_length: Maximum sequence length.
         
     Returns:
         Dictionary with 'input_ids', 'attention_mask', and 'labels'.
     """
+    # Add special tokens
     prompts = examples['prompt']
     completions = examples['completion']
     
@@ -29,18 +30,22 @@ def tokenize_dataset(examples: Dict[str, List[str]], tokenizer: PreTrainedTokeni
         return_tensors="pt"
     )
     
-    input_ids = tokenized['input_ids']
-    labels = input_ids.clone()
+    # Create labels (mask prompt tokens)
+    labels = tokenized['input_ids'].clone()
     
-    # Mask prompt tokens in labels so we don't train on them
-    for i, prompt in enumerate(prompts):
-        prompt_tokens = tokenizer(prompt, truncation=True, max_length=max_length, add_special_tokens=False)['input_ids']
+    # For each example, find where completion starts
+    for i, (prompt, full_text) in enumerate(zip(prompts, texts)):
+        prompt_tokens = tokenizer(prompt, truncation=True, max_length=max_length)['input_ids']
         prompt_len = len(prompt_tokens)
         
-        # Ensure we don't mask the entire sequence if prompt is too long (though truncation should handle it)
+        # Mask prompt tokens in labels (set to -100)
+        # Ensure we don't mask the entire sequence if prompt is too long (though truncation handles this)
         if prompt_len < max_length:
-             labels[i, :prompt_len] = -100
-    
+            labels[i, :prompt_len] = -100
+        else:
+            # If prompt is longer than max_length, the whole thing is masked effectively
+            labels[i, :] = -100
+            
     tokenized['labels'] = labels
     
     return tokenized
