@@ -173,7 +173,37 @@ llm-finetuning-platform/
 
 ---
 
-## 🤝 Contributing
+## � Testing & Quality Assurance
+
+We maintain high code quality through rigorous testing and coverage analysis.
+
+### Running Tests
+
+To run the test suite, simply execute:
+
+```bash
+pytest
+```
+
+### Code Coverage
+
+To generate a coverage report and see how much of the codebase is tested:
+
+```bash
+pytest --cov=src tests/
+```
+
+This will output a terminal report. For a detailed HTML report:
+
+```bash
+pytest --cov=src --cov-report=html tests/
+```
+
+> **Note**: Open `htmlcov/index.html` in your browser to view the interactive coverage report.
+
+---
+
+## �🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and suggest improvements.
 
